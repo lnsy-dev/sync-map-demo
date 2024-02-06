@@ -13,4 +13,6 @@ body {
 qr-code {
   width: 600px;
   margin: 8em;
+  background-color: white;
+  color: black;
 }
