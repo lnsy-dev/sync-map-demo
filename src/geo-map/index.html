@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GEO MAP</title>
+  <script src="/index.js" type="module" defer></script>
+  <link rel="stylesheet" type="text/css" href="/index.css">
+  <style>
+    body {
+      margin: 0;
+    }
+    geo-map {
+      width: 100vw;
+      height: 100vh;
+      background-color:black;
+    }
+  </style>
+</head>
+<body>
+<geo-map id="geo_map"
+  id="geo_map"
+  accesstoken=pk.eyJ1IjoibG5zeWFzdGVyaXVzIiwiYSI6ImNsNXp0bG1zZTFnOWszYnF2Nm1jbjdxamUifQ.NBU_Y2rMUWOKon2Z2WY7MQ
+  styleurl=mapbox://styles/lnsyasterius/clnkp8o2o002c01qwaqxp6rvl
+  latitude= 33.86716840617632
+  longitude=-118.12701323464881
+  navigation
+  geolocate
+  geocoder=true>
+  <geo-json src="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson" variable="mag">
+    <template id="popup-template">
+      <h1>${title}</h1>
+      <p>Magnitude: ${mag}</p>
+      <p>Type: ${type}</p>
+    </template>
+  </geo-json>
+</geo-map>
+
+</body>
+</html>
+
