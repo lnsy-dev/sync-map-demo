@@ -1,0 +1,9 @@
+[submodule "src/geo-map"]
+	path = src/geo-map
+	url = git@github.com:DATAROOM-NETWORK/geo-map.git
+[submodule "src/qr-code-element"]
+	path = src/qr-code-element
+	url = git@github.com:lnsy-dev/qr-code-element.git
+[submodule "src/sync-component"]
+	path = src/sync-component
+	url = git@github.com:lnsy-dev/sync-component.git

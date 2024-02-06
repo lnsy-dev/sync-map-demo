@@ -3,32 +3,110 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Vanilla JS / CSS boilerplate for generating JS and CSS libraries in plain CSS, JS, and HTML. Created by LNSY.">
-  <meta name="keywords" content="Vanilla JS, CSS, boilerplate, library, LNSY">
+  <meta name="description" content="Sync Map Demo">
+  <meta name="keywords" content="Sync Map Demo">
   <meta name="author" content="LNSY">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph meta tags for better sharing on social media -->
-  <meta property="og:title" content="Vanilla JS / CSS boilerplate">
-  <meta property="og:description" content="Vanilla JS / CSS boilerplate for generating JS and CSS libraries in plain CSS, JS, and HTML. Created by LNSY.">
+  <meta property="og:title" content="Sync Map Demo">
+  <meta property="og:description" content="Sync Map Demo.">
   <meta property="og:image" content="./assets/splash.jpg">
   <meta property="og:url" content="https://example.com"> <!-- Replace with your actual URL -->
 
-  <title>Vanilla JS / CSS boilerplate</title>
-  <link rel="stylesheet" type="text/css" href="./styles/index.css">
-  <script src="./src/index.js" type="module"></script>
+  <title>Map Sync Demo</title>
+  <script src="./dist/bundle.min.js" type="module"></script>
 </head>
 <body>
 
-  <img src="./assets/splash.jpg" alt="Boilerplate Image" style="margin:auto; width:40em; height:auto;">
 
-  <h1>Vanilla JS / CSS boilerplate</h1>
-  <h2>By <a href="https://lnsy.dev/" rel="author">LNSY</a></h2>
-  <custom-html-element></custom-html-element>
+<geo-map id="geo_map"
+  id="geo_map"
+  accesstoken=pk.eyJ1IjoibG5zeWFzdGVyaXVzIiwiYSI6ImNsNXp0bG1zZTFnOWszYnF2Nm1jbjdxamUifQ.NBU_Y2rMUWOKon2Z2WY7MQ
+  styleurl=mapbox://styles/lnsyasterius/clnkp8o2o002c01qwaqxp6rvl
+  latitude= 33.86716840617632
+  longitude=-118.12701323464881>
+</geo-map>
 
-  <p>For generating JS and CSS libraries in plain CSS, JS, and HTML.</p>
 
-  <p>For more information, see the README</p>
+<sync-component id="sync_component">
+</sync-component>
+<div id="message_container"></div>
+
+<script>
+
+const getURLValues = (URL = window.location.href ) =>{
+  const search_params = new URLSearchParams(URL)
+  let options = {}
+  for (const [key, unparsed_value] of search_params) {
+    if(key !== window.location.origin + window.location.pathname + '?' ){
+      try {
+        const value = JSON.parse(decodeURI(unparsed_value))
+        options[key] = value
+      } catch {
+        options[key] = decodeURI(unparsed_value)
+      }
+    }
+  }
+  return options
+}
+
+const url_values = getURLValues();
+const IS_PEER = url_values["peer-id"] !== undefined;
+let NOT_YET_PEERED = true;
+
+sync_component.addEventListener('PEER-MESSAGE', (e) => {
+  geo_map.map.flyTo({center:e.detail.message,zoom: 18});
+
+});
+
+sync_component.addEventListener('PEER-CONNECTED', (e) => {
+  if(IS_PEER && NOT_YET_PEERED){
+    const gps_container = document.createElement('div');
+    gps_container.setAttribute('id', 'gps_container');
+    const gps_button = document.createElement('button');
+    gps_button.innerText = 'Share GPS Location';
+    gps_button.addEventListener('click', (e) => {
+      e.preventDefault();
+      getGeolocation();
+    })
+    gps_container.appendChild(gps_button);
+
+    document.body.appendChild(gps_container);
+    NOT_YET_PEERED = false;
+  } else {
+    const qr_code = document.querySelector('qr-code');
+    qr_code ? qr_code.remove() : null;
+  }
+});
+
+sync_component.addEventListener('SERVER-CONNECTION-OPEN', (e) => {
+  const sync_url = sync_component.getAttribute('peer-link');
+  const qr_code = document.createElement('qr-code');
+  qr_code.setAttribute('value', sync_url);
+  document.body.appendChild(qr_code);
+});
+
+</script>
+
+<script>
+function getGeolocation() {
+  // Check if Geolocation API is available
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      sync_component.sendMessage({lat: latitude, lng: longitude});
+      gps_container.innerHTML = `<p>GPS Coordinates Sent</p>`
+    }, function(error) {
+      console.error(error);
+    });
+  } else {
+    gps_container.innerHTML = "<error>Geolocation is not supported by this browser.</error>";
+  }
+}
+</script>
+
 
 </body>
 </html>

@@ -1,9 +1,16 @@
 @import "./reset.css";
 @import "./variables.css";
+@import "../src/qr-code-element/styles/index.css";
+@import "../src/geo-map/index.css";
 
 body {
   background-color: var(--bg-color);
   color: var(--fg-color);
   font-family: monospace;
   text-align: center;
+}
+
+qr-code {
+  width: 600px;
+  margin: 8em;
 }

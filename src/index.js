@@ -1,1 +1,3 @@
-import  "./custom-html-element.js";
+import "./qr-code-element/index.js";
+import "./geo-map/index.js";
+import "./sync-component/index.js";
