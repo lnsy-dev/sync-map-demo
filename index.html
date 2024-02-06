@@ -17,22 +17,62 @@
   <title>Map Sync Demo</title>
   <link rel="stylesheet" type="text/css" href="./styles/index.css">
   <script src="./src/index.js" type="module"></script>
+  <style>
+    body {
+      background-color: black;
+      font-family: sans-serif;
+    }
+    geo-map {
+      position: fixed;
+      left: 0px;
+      top: 0px;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+    }
+
+    #message_container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20em;
+      background-color: white;
+    }
+
+    qr-code {
+      width: 20em;
+      padding: 1em;
+      margin: auto;
+    }
+
+    #gps_container {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    sync-component {
+      position: fixed;
+      left: 0px;
+      top: 0px;
+      background-color: rgba(0,0,0,0.8);
+      color: white;
+      font-size: 60%;
+      padding: 1em;
+    }
+  </style>
 </head>
 <body>
 
-
-<geo-map id="geo_map"
-  id="geo_map"
-  accesstoken=pk.eyJ1IjoibG5zeWFzdGVyaXVzIiwiYSI6ImNsNXp0bG1zZTFnOWszYnF2Nm1jbjdxamUifQ.NBU_Y2rMUWOKon2Z2WY7MQ
-  styleurl=mapbox://styles/lnsyasterius/clnkp8o2o002c01qwaqxp6rvl
-  latitude= 33.86716840617632
-  longitude=-118.12701323464881>
-</geo-map>
+<div id="geo_map_container"></div>
 
 
 <sync-component id="sync_component">
 </sync-component>
-<div id="message_container"></div>
+<div id="message_container">
+</div>
 
 <script>
 
@@ -56,10 +96,31 @@ const url_values = getURLValues();
 const IS_PEER = url_values["peer-id"] !== undefined;
 let NOT_YET_PEERED = true;
 
+if(!IS_PEER){
+  console.log('is not peer')
+    geo_map_container.innerHTML = `
+    <geo-map id="geo_map"
+      id="geo_map"
+      accesstoken=pk.eyJ1IjoibG5zeWFzdGVyaXVzIiwiYSI6ImNsNXp0bG1zZTFnOWszYnF2Nm1jbjdxamUifQ.NBU_Y2rMUWOKon2Z2WY7MQ
+      styleurl=mapbox://styles/lnsyasterius/clnkp8o2o002c01qwaqxp6rvl
+      latitude= 0
+      longitude=0
+      zoom=2>
+
+    </geo-map>
+    `
+}
+
 sync_component.addEventListener('PEER-MESSAGE', (e) => {
   geo_map.map.flyTo({center:e.detail.message,zoom: 18});
+  var marker = new mapboxgl.Marker()
+    .setLngLat(e.detail.message) // Replace with the longitude and latitude of the location
+    .addTo(geo_map.map);
 
+
+  message_container.remove();
 });
+
 
 sync_component.addEventListener('PEER-CONNECTED', (e) => {
   if(IS_PEER && NOT_YET_PEERED){
@@ -72,20 +133,24 @@ sync_component.addEventListener('PEER-CONNECTED', (e) => {
       getGeolocation();
     })
     gps_container.appendChild(gps_button);
+    message_container.remove();
 
     document.body.appendChild(gps_container);
     NOT_YET_PEERED = false;
   } else {
     const qr_code = document.querySelector('qr-code');
     qr_code ? qr_code.remove() : null;
+    message_container.innerHTML = `<div>Please click the Share GPS button on your cell phone and allow Geo Location</div>`;
   }
+
 });
 
 sync_component.addEventListener('SERVER-CONNECTION-OPEN', (e) => {
   const sync_url = sync_component.getAttribute('peer-link');
   const qr_code = document.createElement('qr-code');
   qr_code.setAttribute('value', sync_url);
-  document.body.appendChild(qr_code);
+  message_container.innerHTML = '<h2>Scan the QR Code with your cell phone to locate yourself on the map</h2>'
+  message_container.appendChild(qr_code);
 });
 
 </script>
