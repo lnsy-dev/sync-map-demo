@@ -1,5 +1,7 @@
 ![Splash Image](./assets/splash.jpg?)
 
+TESTING
+
 # vanilla-webpack-boilerplate
 For writing passionate Javascript.
 
